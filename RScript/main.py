@@ -51,7 +51,7 @@ def libraries():
     return [re.sub(r'\.sorted\.init$', '', f) for f in files]
 
 
-def covAndLen(library):
+def covAndLen(library, rna_length):
     pre_myinit = pd.read_table(library + ".sorted.init", header=None, usecols=[2])
     pre_my3p = pd.read_table(library + ".sorted.3p", header=None, usecols=[2])
     # shifting reads by 1 bp
@@ -64,12 +64,15 @@ def covAndLen(library):
 if __name__ == '__main__':
     win_size = int(sys.argv[1])
     W = ((1 + (1 - 0.1 * win_size)) * win_size) / 2
-    rna_length = int(sys.argv[2])
+
     directory_path = sys.argv[3]
 
+    # would consider using the code from count init\3p that found the different libraries and
+    # the length of the RNA, and then save them as a tuple in a list
     mylibs = libraries()
+    rna_length = int(sys.argv[2])
 
     for library in mylibs:
-        myinit, my3p, mycov, mylength = covAndLen(library)
+        myinit, my3p, mycov, mylength = covAndLen(library, rna_length)
         Sa, Sb, Sc = calculateScores(mycov, mylength, win_size, W)
         createFile(library, Sa, Sb, Sc, myinit, my3p, mycov, mylength)
