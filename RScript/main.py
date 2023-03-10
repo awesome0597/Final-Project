@@ -6,8 +6,12 @@ import pandas as pd
 from Bio import SeqIO
 
 
-def createFile(library, Sa, Sb, Sc, myinit, my3p, mycov, mylength):
-    pass
+def createFile(library, Sa, Sb, Sc, myinit, my3p, mycov):
+    ## Need to generalize for multiple files, currently works only for one file
+
+    df = pd.DataFrame({'5p': myinit, '3p': my3p,
+                       'cov': mycov, 'Sa': Sa, 'Sb': Sb, 'Sc': Sc})
+    df.to_csv(f'{library}.csv', index=False)
 
 
 def stats(mycov, start, end):
@@ -44,7 +48,7 @@ def calculateScores(mycov, mylength, win_size, W):
     return Sa, Sb, Sc
 
 
-def libraries():
+def libraries(directory_path):
     file_pattern = re.compile(r'sorted\.init$')
     files = [f for f in os.listdir(directory_path) if file_pattern.match(f)]
 
@@ -62,15 +66,25 @@ def covAndLen(library, rna_length):
 
 
 if __name__ == '__main__':
+    ## The program takes a window size and a directory path as arguments
     win_size = int(sys.argv[1])
     W = ((1 + (1 - 0.1 * win_size)) * win_size) / 2
 
-    directory_path = sys.argv[3]
+    directory_path = sys.argv[2]
 
     # would consider using the code from count init\3p that found the different libraries and
     # the length of the RNA, and then save them as a tuple in a list
-    mylibs = libraries()
+    # also need to see how we generalize the code for the fasta file, maybe consider putting it
+    # as part of the array?
+
+    mylibs = libraries(directory_path)
     rna_length = int(sys.argv[2])
+    file_path = "C:/Users/User/OneDrive - Bar Ilan University/Bioinfo Computer/Shula/HydraPsi/Files/TB_rRNA_chr2.fa"
+    myfasta = []
+    with open(file_path) as handle:
+        for record in SeqIO.parse(handle, "fasta"):
+            myfasta.append(str(record.seq))
+
 
     for library in mylibs:
         myinit, my3p, mycov, mylength = covAndLen(library, rna_length)
