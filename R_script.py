@@ -2,21 +2,22 @@ import statistics
 import sys
 import numpy as np
 import pandas as pd
-from Bio import SeqIO
+#from Bio import SeqIO
 
 
-def createFile(genes_list, score_a, score_b, score_c, my_init, my_3p, my_cov, fasta, sno_data):
+def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p, my_cov):
+    # , fasta, sno_data
     # Need to generalize for multiple files, currently works only for one file, add fasta file when accessible
-    sno_rna = sno_data['snoRNA'].tolist()
-    modification = sno_data['modified'].tolist()
+    # sno_rna = sno_data['snoRNA'].tolist()
+    # modification = sno_data['modified'].tolist()
     number_list = []
     for i in range(1, len(score_b) + 1):
         number_list.append(i)
-    fasta = fasta[:len(my_init)]
-    genes_list = genes_list[:len(my_init)]
+    # fasta = fasta[:len(my_init)]
+    genes_list = gene_list[:len(my_init)]
     df = pd.DataFrame({'Gene': genes_list, ' ': number_list, '5p': my_init, '3p': my_3p,
-                       'cov': my_cov, 'Sa': score_a, 'Sb': score_b, 'Sc': score_c,
-                       'bp': fasta, 'modification': modification[:len(my_init)], 'snoRNA': sno_rna[:len(my_init)]})
+                       'cov': my_cov, 'Sa': score_a, 'Sb': score_b, 'Sc': score_c})
+    # 'bp': fasta, 'modification': modification[:len(my_init)], 'snoRNA': sno_rna[:len(my_init)]}
     df.to_excel("output.xlsx", index=False)
 
 
@@ -84,24 +85,22 @@ if __name__ == '__main__':
     gene_list_per_base_pair = []
     with open(sys.argv[1], 'r') as file1:
         for line in file1:
-            chrom, rna_length = line.strip().split('\t')
-            genes_to_add = [chrom] * int(rna_length)
+            chrom, rna_length = line.strip().split('    ')
+            genes_to_add = [chrom] * (int(rna_length) + 1)
             gene_list_per_base_pair.extend(genes_to_add)
     file1.close()
     init_file, trep_file = sys.argv[2], sys.argv[3]
     # handle fasta file
-    fasta_file_path = sys.argv[4]
-    chrom, base_pair_range = chrom.split(':')
-    start_bp, end_bp = base_pair_range.split('-')
+    # fasta_file_path = sys.argv[4]
     myfasta = []
-    with open(fasta_file_path) as handle:
-        for record in SeqIO.parse(handle, "fasta"):
-            myfasta.append(str(record.seq))
-    handle.close()
-    fasta_as_list = []
-    fasta_as_list[:0] = myfasta[0]
-    sno_df = pd.read_table(sys.argv[5], delimiter="\t")
-    new_sno_df = sno_df[['modified', 'snoRNA']]
+    # with open(fasta_file_path) as handle:
+    #    for record in SeqIO.parse(handle, "fasta"):
+    #        myfasta.append(str(record.seq))
+    # handle.close()
+    # fasta_as_list = []
+    # fasta_as_list[:0] = myfasta[0]
+    # sno_df = pd.read_table(sys.argv[5], delimiter="\t")
+    # new_sno_df = sno_df[['modified', 'snoRNA']]
 
     # would consider using the code from count init\3p that found the different libraries and
     # the length of the RNA, and then save them as a tuple in a list
@@ -111,4 +110,6 @@ if __name__ == '__main__':
 
     myinit, my3p, mycov, mylength = covAndLen(init_file, trep_file)
     Sa, Sb, Sc = calculateScores(mycov, mylength)
-    createFile(gene_list_per_base_pair, Sa, Sb, Sc, myinit, my3p, mycov, fasta_as_list, new_sno_df)
+    createFile(gene_list_per_base_pair, Sa, Sb, Sc, myinit, my3p, mycov)
+    # , fasta_as_list
+# , new_sno_df
