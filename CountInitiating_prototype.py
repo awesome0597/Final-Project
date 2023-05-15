@@ -6,7 +6,7 @@ genome_hash = {}
 with open(sys.argv[1], 'r') as file1:
     for line in file1:
         chrom, length = line.strip().split('\t')
-        genome_hash[chrom] = [0] * (int(length))
+        genome_hash[chrom] = [0] * (int(length)+1)
 file1.close()
 with open(sys.argv[2], 'r') as file2:
     for line in file2:
