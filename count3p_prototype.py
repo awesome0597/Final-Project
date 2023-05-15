@@ -2,7 +2,7 @@ import sys
 
 genome_hash = {}
 
-# actual genome file
+# choords file
 with open(sys.argv[1], 'r') as file1:
     for line in file1:
         chrom, length = line.strip().split('\t')

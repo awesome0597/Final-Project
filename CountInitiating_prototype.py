@@ -2,11 +2,11 @@ import sys
 
 genome_hash = {}
 
-# actual genome file
+# choords file
 with open(sys.argv[1], 'r') as file1:
     for line in file1:
         chrom, length = line.strip().split('\t')
-        genome_hash[chrom] = [0] * int(length)
+        genome_hash[chrom] = [0] * (int(length))
 file1.close()
 with open(sys.argv[2], 'r') as file2:
     for line in file2:
