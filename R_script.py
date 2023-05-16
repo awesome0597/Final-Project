@@ -17,7 +17,7 @@ def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p, my_cov, num
     df = pd.DataFrame({'Gene': genes_list, ' ': number_list_appended, '5p': my_init, '3p': my_3p,
                        'cov': my_cov, 'Sa': score_a, 'Sb': score_b, 'Sc': score_c})
     # 'bp': fasta, 'modification': modification[:len(my_init)], 'snoRNA': sno_rna[:len(my_init)]}
-    df.to_excel("output.xlsx", index=False)
+    df.to_excel("Ribosomal_test.xlsx", index=False)
 
 
 def stats(my_cov, start, end):
@@ -38,11 +38,11 @@ def calculateScores(my_number_list, my_cov, my_length):
             score_b[i] = "NA"
             score_c[i] = "NA"
         else:
-            if i == 22564:
-                print(i)
             # A Score
-            m_l, s_l = stats(my_cov, i - win_size / 2, i - 1)
-            m_r, s_r = stats(my_cov, i + 1, i + win_size / 2)
+            m_l, s_l = stats(my_cov, i - win_size / 2, i)
+            m_r, s_r = stats(my_cov, i + 1, (i + 1) + win_size / 2)
+            if i == 3436:
+                print("hi")
 
             score_a[i] = max(0, 1 - (2 * my_cov[i] + 1) / (0.5 * abs(m_l - s_l) + my_cov[i] + 0.5 * abs(m_r - s_r) + 1))
 
@@ -70,8 +70,15 @@ def calculateScores(my_number_list, my_cov, my_length):
 def covAndLen(init_library, three_p_library):
     pre_my_init = pd.read_table(init_library, header=None, usecols=[2])
     pre_my3p = pd.read_table(three_p_library, header=None, usecols=[2])
+    init_to_move = pre_my_init[2].tolist()
     my_new_init = pre_my_init[2].tolist()
     my_new_3p = pre_my3p[2].tolist()
+    my_new_3p.append(0)
+    init_to_move.append(0)
+    my_new_init.append(0)
+    for i in range(0, len(my_new_init) - 2):
+        my_new_init[i + 2] = init_to_move[i]
+
     cov = []
     for i in range(0, len(my_new_init)):
         cov.append(my_new_init[i] + my_new_3p[i])
@@ -89,10 +96,10 @@ if __name__ == '__main__':
     number_list = []
     with open(sys.argv[1], 'r') as file1:
         for line in file1:
-            chrom, rna_length = line.strip().split('    ')
-            genes_to_add = [chrom] * (int(rna_length) + 1)
+            chrom, rna_length = line.strip().split('\t')
+            genes_to_add = [chrom] * (int(rna_length))
             gene_list_per_base_pair.extend(genes_to_add)
-            for p in range(0, int(rna_length) + 1):
+            for p in range(0, int(rna_length)):
                 number_list.append(p)
     file1.close()
     init_file, trep_file = sys.argv[2], sys.argv[3]
