@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFormLayout, QGr
     QComboBox
 
 
-def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p, my_cov, number_list_appended):
+def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p, my_cov, number_list_appended, output_file_name):
     # , fasta, sno_data
     # Need to generalize for multiple files, currently works only for one file, add fasta file when accessible
     # sno_rna = sno_data['snoRNA'].tolist()
@@ -17,7 +17,7 @@ def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p, my_cov, num
     df = pd.DataFrame({'Gene': genes_list, ' ': number_list_appended, '5p': my_init, '3p': my_3p,
                        'cov': my_cov, 'Sa': score_a, 'Sb': score_b, 'Sc': score_c})
     # 'bp': fasta, 'modification': modification[:len(my_init)], 'snoRNA': sno_rna[:len(my_init)]}
-    df.to_excel("Ribosomal_test.xlsx", index=False)
+    df.to_excel(output_file_name, index=False)
 
 
 def stats(my_cov, start, end):
@@ -121,8 +121,8 @@ def runScript(sequencing_type, window_size, genome_file_path, init_file_path, th
     # as part of the array? done in theory
 
     myinit, my3p, mycov, mylength = covAndLen(init_file_path, three_p_file_path)
-    Sa, Sb, Sc = calculateScores(number_list, mycov, mylength, window_size,W)
-    createFile(gene_list_per_base_pair, Sa, Sb, Sc, myinit, my3p, mycov, number_list)
+    Sa, Sb, Sc = calculateScores(number_list, mycov, mylength, window_size, W)
+    createFile(gene_list_per_base_pair, Sa, Sb, Sc, myinit, my3p, mycov, number_list, output_file_name)
     # , fasta_as_list
     # , new_sno_df
 
@@ -165,6 +165,7 @@ class MyWidget(QWidget):
 
         # Connect the Ok button's clicked signal to the on_ok_button_clicked function
         button_box.accepted.connect(self.on_ok_button_clicked)
+        button_box.rejected.connect(self.on_cancel_button_clicked)
 
         # Add the button box to the main layout
         layout.addWidget(button_box)
@@ -183,6 +184,9 @@ class MyWidget(QWidget):
         process_inputs(inputs)
 
         # Close the dialog or perform other actions as needed
+        self.close()
+
+    def on_cancel_button_clicked(self):
         self.close()
 
 
