@@ -152,7 +152,7 @@ class MyWidget(QWidget):
         window_size.setText('6')
         # set default value for output file name
         output_file_name = QLineEdit()
-        output_file_name.setText('.xslx')
+        output_file_name.setText('temp.xlsx')
         labels_and_inputs = [("Sequencing Type:", combo_box), ("Window Size:", window_size),
                              ("Genome File Path:", QLineEdit()),
                              ("init File Path:", QLineEdit()), ("3p File Path:", QLineEdit()),
