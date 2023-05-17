@@ -96,7 +96,7 @@ def runScript(sequencing_type, window_size, genome_file_path, init_file_path, th
     number_list = []
     with open(genome_file_path, 'r') as file1:
         for line in file1:
-            chrom, rna_length = line.strip().split('\t')
+            chrom, rna_length = line.strip().split()
             genes_to_add = [chrom] * (int(rna_length))
             gene_list_per_base_pair.extend(genes_to_add)
             for p in range(0, int(rna_length)):
@@ -135,19 +135,28 @@ class MyWidget(QWidget):
     def initUI(self):
         # Create the main layout
         layout = QVBoxLayout()
+        # Name for window
+        self.setWindowTitle("Coverage Score Calculations")
+        self.resize(400, 300)
 
         # Create the group box
-        group_box = QGroupBox("Group Box")
+        group_box = QGroupBox("Please Enter the Following Parameters:")
         form_layout = QFormLayout()
 
         # Create the QLineEdit and QComboBox widgets
         combo_box = QComboBox()
         combo_box.addItem("PRS")
         combo_box.addItem("Total RNA")
-        labels_and_inputs = [("Sequencing Type:", combo_box), ("Window Size:", QLineEdit()),
+        # set default value for window size
+        window_size = QLineEdit()
+        window_size.setText('6')
+        # set default value for output file name
+        output_file_name = QLineEdit()
+        output_file_name.setText('.xslx')
+        labels_and_inputs = [("Sequencing Type:", combo_box), ("Window Size:", window_size),
                              ("Genome File Path:", QLineEdit()),
                              ("init File Path:", QLineEdit()), ("3p File Path:", QLineEdit()),
-                             ("Fasta File Path:", QLineEdit()), ("Output File Name:", QLineEdit())]
+                             ("Fasta File Path:", QLineEdit()), ("Output File Name:", output_file_name)]
 
         for i in range(len(labels_and_inputs)):
             label, input_var = labels_and_inputs[i]
@@ -191,7 +200,7 @@ class MyWidget(QWidget):
 
 
 def process_inputs(inputs):
-    # Perform your logic on the inputs
+    # receive the inputs from the user and run the script
     sequencing_type = inputs[0]
     window_size = int(inputs[1])
     genome_file_path = inputs[2]
