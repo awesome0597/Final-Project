@@ -94,14 +94,24 @@ def runScript(sequencing_type, window_size, genome_file_path, init_file_path, th
     # process genomes to work by size
     gene_list_per_base_pair = []
     number_list = []
-    with open(genome_file_path, 'r') as file1:
-        for line in file1:
-            chrom, rna_length = line.strip().split()
-            genes_to_add = [chrom] * (int(rna_length))
-            gene_list_per_base_pair.extend(genes_to_add)
-            for p in range(0, int(rna_length)):
-                number_list.append(p)
-    file1.close()
+    if sequencing_type == "Total RNA":
+        with open(genome_file_path, 'r') as file1:
+            for line in file1:
+                chrom, rna_length = line.strip().split()
+                genes_to_add = [chrom] * (int(rna_length))
+                gene_list_per_base_pair.extend(genes_to_add)
+                for p in range(0, int(rna_length)):
+                    number_list.append(p)
+        file1.close()
+    else:
+        with open(genome_file_path, 'r') as file1:
+            for line in file1:
+                chrom, rna_length = line.strip().split()
+                genes_to_add = [chrom] * (int(rna_length) + 1)
+                gene_list_per_base_pair.extend(genes_to_add)
+                for p in range(0, int(rna_length) + 1):
+                    number_list.append(p)
+        file1.close()
     # handle fasta file
     # fasta_file_path = sys.argv[4]
     myfasta = []
