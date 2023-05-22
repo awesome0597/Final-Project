@@ -1,22 +1,19 @@
 import statistics
 import sys
-import numpy as np
 import pandas as pd
-# from Bio import SeqIO
+from Bio import SeqIO
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFormLayout, QGroupBox, QLineEdit, QDialogButtonBox, \
     QComboBox
 
 
-def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p, my_cov, number_list_appended, output_file_name):
-    # , fasta, sno_data
-    # Need to generalize for multiple files, currently works only for one file, add fasta file when accessible
+def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p,
+               my_cov, number_list_appended, output_file_name, fasta):
+    # , sno_data
     # sno_rna = sno_data['snoRNA'].tolist()
     # modification = sno_data['modified'].tolist()
-    # fasta = fasta[:len(my_init)]
-    genes_list = gene_list[:len(my_init)]
-    df = pd.DataFrame({'Gene': genes_list, ' ': number_list_appended, '5p': my_init, '3p': my_3p,
+    df = pd.DataFrame({'Gene': gene_list, 'Position': number_list_appended, 'bp': fasta, '5p': my_init, '3p': my_3p,
                        'cov': my_cov, 'Sa': score_a, 'Sb': score_b, 'Sc': score_c})
-    # 'bp': fasta, 'modification': modification[:len(my_init)], 'snoRNA': sno_rna[:len(my_init)]}
+    # , 'modification': modification[:len(my_init)], 'snoRNA': sno_rna[:len(my_init)]}
     df.to_excel(output_file_name, index=False)
 
 
@@ -26,14 +23,14 @@ def stats(my_cov, start, end):
     return mean, std
 
 
-def calculateScores(my_number_list, my_cov, my_length, win_size, W):
+def calculateScores(my_number_list, my_cov, my_length, win_size, w):
     # we can consider using a numpy array instead of a list
     score_a = [0] * my_length
     score_b = [0] * my_length
     score_c = [0] * my_length
 
     for i in range(0, my_length - win_size):
-        if my_number_list[i] < 5 or my_number_list[i + 5] < 5:
+        if my_number_list[i] < 6 or my_number_list[i + 5] < 7:
             score_a[i] = "NA"
             score_b[i] = "NA"
             score_c[i] = "NA"
@@ -41,8 +38,6 @@ def calculateScores(my_number_list, my_cov, my_length, win_size, W):
             # A Score
             m_l, s_l = stats(my_cov, i - win_size / 2, i)
             m_r, s_r = stats(my_cov, i + 1, (i + 1) + win_size / 2)
-            if i == 3436:
-                print("hi")
 
             score_a[i] = max(0, 1 - (2 * my_cov[i] + 1) / (0.5 * abs(m_l - s_l) + my_cov[i] + 0.5 * abs(m_r - s_r) + 1))
 
@@ -51,11 +46,11 @@ def calculateScores(my_number_list, my_cov, my_length, win_size, W):
             for j in range(1, win_size + 1):
                 s1 += (1 - 0.1 * (j - 1)) * my_cov[i - j]
 
-            s1 = s1 / W
+            s1 = s1 / w
             s2 = 0
             for j in range(1, win_size + 1):
                 s2 += (1 - 0.1 * (j - 1)) * my_cov[i + j]
-            s2 = s2 / W
+            s2 = s2 / w
             try:
                 score_c[i] = max(0, 1 - (2 * my_cov[i]) / (s1 + s2))
             except ZeroDivisionError:
@@ -67,17 +62,19 @@ def calculateScores(my_number_list, my_cov, my_length, win_size, W):
     return score_a, score_b, score_c
 
 
-def covAndLen(init_library, three_p_library):
+def covAndLen(my_number_list, init_library, three_p_library):
     pre_my_init = pd.read_table(init_library, header=None, usecols=[2])
     pre_my3p = pd.read_table(three_p_library, header=None, usecols=[2])
-    init_to_move = pre_my_init[2].tolist()
     my_new_init = pre_my_init[2].tolist()
+    my_holder_init = pre_my_init[2].tolist()
+    my_holder_3p = pre_my3p[2].tolist()
     my_new_3p = pre_my3p[2].tolist()
-    my_new_3p.append(0)
-    init_to_move.append(0)
-    my_new_init.append(0)
-    for i in range(0, len(my_new_init) - 2):
-        my_new_init[i + 2] = init_to_move[i]
+    for i in range(0, len(my_new_init) - 1):
+        my_new_init[i + 1] = my_holder_init[i]
+    my_new_init[0] = 0
+    for i in range(len(my_new_3p) - 1, 1, -1):
+        my_new_3p[i-1] = my_holder_3p[i]
+    my_new_3p[len(my_new_3p) - 1] = 0
 
     cov = []
     for i in range(0, len(my_new_init)):
@@ -89,38 +86,29 @@ def covAndLen(init_library, three_p_library):
 def runScript(sequencing_type, window_size, genome_file_path, init_file_path, three_p_file_path, fasta_file_path,
               output_file_name):
     # The program takes a genome file, init file, 3p file, fasta file path and known snoRNA info as arguments
-    W = (1 + (1 - 0.1 * window_size)) * window_size / 2
+    w = (1 + (1 - 0.1 * window_size)) * window_size / 2
 
     # process genomes to work by size
     gene_list_per_base_pair = []
     number_list = []
-    if sequencing_type == "Total RNA":
-        with open(genome_file_path, 'r') as file1:
-            for line in file1:
-                chrom, rna_length = line.strip().split()
-                genes_to_add = [chrom] * (int(rna_length))
-                gene_list_per_base_pair.extend(genes_to_add)
-                for p in range(0, int(rna_length)):
-                    number_list.append(p)
-        file1.close()
-    else:
-        with open(genome_file_path, 'r') as file1:
-            for line in file1:
-                chrom, rna_length = line.strip().split()
-                genes_to_add = [chrom] * (int(rna_length) + 1)
-                gene_list_per_base_pair.extend(genes_to_add)
-                for p in range(0, int(rna_length) + 1):
-                    number_list.append(p)
-        file1.close()
+    with open(genome_file_path, 'r') as file1:
+        for line in file1:
+            chrom, rna_length = line.strip().split()
+            genes_to_add = [chrom] * (int(rna_length) + 1)
+            gene_list_per_base_pair.extend(genes_to_add)
+            for p in range(0, int(rna_length) + 1):
+                number_list.append(p)
+    file1.close()
     # handle fasta file
-    # fasta_file_path = sys.argv[4]
     myfasta = []
-    # with open(fasta_file_path) as handle:
-    #    for record in SeqIO.parse(handle, "fasta"):
-    #        myfasta.append(str(record.seq))
-    # handle.close()
-    # fasta_as_list = []
-    # fasta_as_list[:0] = myfasta[0]
+    fasta_as_list = []
+    with open(fasta_file_path) as handle:
+        for record in SeqIO.parse(handle, "fasta"):
+            myfasta.append(str(record.seq))
+    handle.close()
+    for fasta_string in myfasta:
+        fasta_string = "<" + fasta_string
+        fasta_as_list.extend(list(fasta_string))
     # sno_df = pd.read_table(sys.argv[5], delimiter="\t")
     # new_sno_df = sno_df[['modified', 'snoRNA']]
 
@@ -130,10 +118,9 @@ def runScript(sequencing_type, window_size, genome_file_path, init_file_path, th
     # also need to see how we generalize the code for the fasta file, maybe consider putting it
     # as part of the array? done in theory
 
-    myinit, my3p, mycov, mylength = covAndLen(init_file_path, three_p_file_path)
-    Sa, Sb, Sc = calculateScores(number_list, mycov, mylength, window_size, W)
-    createFile(gene_list_per_base_pair, Sa, Sb, Sc, myinit, my3p, mycov, number_list, output_file_name)
-    # , fasta_as_list
+    myinit, my3p, mycov, mylength = covAndLen(number_list, init_file_path, three_p_file_path)
+    sa, sb, sc = calculateScores(number_list, mycov, mylength, window_size, w)
+    createFile(gene_list_per_base_pair, sa, sb, sc, myinit, my3p, mycov, number_list, output_file_name, fasta_as_list)
     # , new_sno_df
 
 
@@ -228,3 +215,7 @@ if __name__ == '__main__':
     widget = MyWidget()
     widget.show()
     sys.exit(app.exec_())
+
+# 942PRS16012023_S7_vs_smallRNA_good_pairs_prototype.sorted.init
+# TB_small_RNAs_DB_w_praveen.fa
+# actual_genome.txt
