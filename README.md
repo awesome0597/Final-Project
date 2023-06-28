@@ -1,15 +1,30 @@
 # PRS Pipeline and Scoring system
-## Instruction for pipeline:
-
-
-## Instructions for Scoring system:
-This program returns scoring based on the methods mentioned in the article: [insert article].<br>
-This program can be run on two types of sequencing files:
+## Pipeline:
+This program is a NGS pipeline for processing RNAseq files.
+### Sequencing Types:
+* Total RNA
+* PRS<br>
+### Required Packages:
 1. Total RNA
-2. PRS
-<br>To run the program make sure you have the following packages installed:
-1. a
-2. a
-3. a
-4. a
+2. PRS<br>
+### Run Instructions:
+//add instruction about file orginization<br>
+//explain about output files<br>
+//add run instructions<br>
+*This program is intended to run in a linux enviroment.<br>
+
+
+## Scoring system:
+This program returns scoring based on the methods mentioned in the article: [insert article].<br>
+### Sequencing Types:
+* Total RNA
+* PRS<br>
+### Required Packages:
+1. Total RNA
+2. PRS<br>
+### Run Instructions:
+//add instruction about file orginization<br>
+//explain about output files<br>
+//add run instructions<br>
+
 *It is recommended to run the program in a windows enviroment
