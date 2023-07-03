@@ -73,7 +73,6 @@ python3 Scores_script.py
 The script will launch a graphical user interface (GUI) window.
 
 Enter the required parameters in the provided fields:
-
 -Sequencing Type: Select the type of sequencing from the dropdown menu (PRS or Total RNA).
 -Window Size: Enter the window size for score calculations (default is 6).
 -Genome File Path: Enter the path to the genome file containing chromosome and RNA length information.
