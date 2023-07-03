@@ -73,13 +73,13 @@ python3 Scores_script.py
 The script will launch a graphical user interface (GUI) window.
 
 Enter the required parameters in the provided fields:
--Sequencing Type: Select the type of sequencing from the dropdown menu (PRS or Total RNA).
--Window Size: Enter the window size for score calculations (default is 6).
--Genome File Path: Enter the path to the genome file containing chromosome and RNA length information.
--init File Path: Enter the path to the init file containing initial library data.
--3p File Path: Enter the path to the 3p file containing 3' library data.
--Fasta File Path: Enter the path to the FASTA file containing genomic sequences.
--Output File Name: Enter the desired name for the output Excel file (default is temp.xlsx).
+- Sequencing Type: Select the type of sequencing from the dropdown menu (PRS or Total RNA).
+- Window Size: Enter the window size for score calculations (default is 6).
+- Genome File Path: Enter the path to the genome file containing chromosome and RNA length information.
+- init File Path: Enter the path to the init file containing initial library data.
+- 3p File Path: Enter the path to the 3p file containing 3' library data.
+- Fasta File Path: Enter the path to the FASTA file containing genomic sequences.
+- Output File Name: Enter the desired name for the output Excel file (default is temp.xlsx).
 
 The script will process the inputs and generate the output file with coverage scores.
 
