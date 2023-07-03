@@ -57,13 +57,19 @@ PyQt5
 ### Installation
 Clone the repository or download the script file.
 Install the required dependencies using pip:
-   pip install pandas biopython pyqt5
+```
+pip install pandas biopython pyqt5
+```
 
 This program returns scoring based on the methods mentioned in the article: [insert article].<br>
 ### Sequencing Types:
 * Total RNA
 * PRS<br>
 ### Program Instructions:
+Run the script using the following command:
+```
+python3 Scores_script.py
+```
 The script will launch a graphical user interface (GUI) window.
 
 Enter the required parameters in the provided fields:
