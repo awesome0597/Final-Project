@@ -8,23 +8,21 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFormLayout, QGr
 
 def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p,
                my_cov, number_list_appended, output_file_name, fasta):
-    # , sno_data
-    # sno_rna = sno_data['snoRNA'].tolist()
-    # modification = sno_data['modified'].tolist()
+    #Create a dataframe with the sequencing for all the different genes
     df = pd.DataFrame({'Gene': gene_list, 'Position': number_list_appended, 'bp': fasta, '5p': my_init, '3p': my_3p,
                        'cov': my_cov, 'Sa': score_a, 'Sb': score_b, 'Sc': score_c})
-    # , 'modification': modification[:len(my_init)], 'snoRNA': sno_rna[:len(my_init)]}
+    # Save file to excel
     df.to_excel(output_file_name, index=False)
 
 
 def stats(my_cov, start, end):
+    #calculate the mean and standard deviation of the coverage
     mean = statistics.fmean(my_cov[int(start):int(end)])
     std = statistics.stdev(my_cov[int(start):int(end)])
     return mean, std
 
 
 def calculateScores(my_number_list, my_cov, my_length, win_size, w):
-    # we can consider using a numpy array instead of a list
     score_a = [0] * my_length
     score_b = [0] * my_length
     score_c = [0] * my_length
@@ -152,7 +150,7 @@ class MyWidget(QWidget):
         output_file_name.setText('temp.xlsx')
         # set default genome file
         genome_file_path = QLineEdit()
-        genome_file_path.setText('actual_genome.txt')
+        genome_file_path.setText('PRS_genome.txt')
         # set fasta file
         fasta_file_path = QLineEdit()
         fasta_file_path.setText('TB_small_RNAs_DB_w_praveen.fa')
