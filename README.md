@@ -61,7 +61,7 @@ Install the required dependencies using pip:
 pip install pandas biopython pyqt5
 ```
 
-This program returns scoring based on the methods mentioned in the article: [insert article].<br>
+This program returns scoring based on the methods mentioned in the article: https://pubmed.ncbi.nlm.nih.gov/25417815.<br>
 ### Sequencing Types:
 * Total RNA
 * PRS<br>
