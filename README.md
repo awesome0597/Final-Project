@@ -45,18 +45,40 @@ This script is designed to process FASTQ files and perform various operations on
 * genomecov file computed from the recived bed file
 * init file presenting read ends per nucliotide of every mapped file.
 * 3p file presenting read beginings per nucliotide of every mapped file.
-
+____________________________________________________________________________________________________________________________________________________________________
 ## Scoring system:
+The Coverage Score Calculations script is a Python program that calculates coverage scores for different genes based on provided sequencing data. It takes into account various parameters such as the type of sequencing, window size, and input files, and generates an output file with the calculated scores.
+
+### Required Packages:
+Python 3.x
+pandas
+BioPython
+PyQt5
+### Installation
+Clone the repository or download the script file.
+Install the required dependencies using pip:
+   pip install pandas biopython pyqt5
+
 This program returns scoring based on the methods mentioned in the article: [insert article].<br>
 ### Sequencing Types:
 * Total RNA
 * PRS<br>
-### Required Packages:
-1. Total RNA
-2. PRS<br>
 ### Program Instructions:
-#### file orginization<br>
-#### output files<br>
-#### run instructions<br>
+The script will launch a graphical user interface (GUI) window.
 
+Enter the required parameters in the provided fields:
+
+-Sequencing Type: Select the type of sequencing from the dropdown menu (PRS or Total RNA).
+-Window Size: Enter the window size for score calculations (default is 6).
+-Genome File Path: Enter the path to the genome file containing chromosome and RNA length information.
+-init File Path: Enter the path to the init file containing initial library data.
+-3p File Path: Enter the path to the 3p file containing 3' library data.
+-Fasta File Path: Enter the path to the FASTA file containing genomic sequences.
+-Output File Name: Enter the desired name for the output Excel file (default is temp.xlsx).
+
+The script will process the inputs and generate the output file with coverage scores.
+
+Once the calculations are complete, the GUI window will close automatically.
+
+## Additional Information
 *It is recommended to run the program in a windows enviroment
