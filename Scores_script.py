@@ -150,10 +150,16 @@ class MyWidget(QWidget):
         # set default value for output file name
         output_file_name = QLineEdit()
         output_file_name.setText('temp.xlsx')
+        # set default genome file
+        genome_file_path = QLineEdit()
+        genome_file_path.setText('actual_genome.txt')
+        # set fasta file
+        fasta_file_path = QLineEdit()
+        fasta_file_path.setText('TB_small_RNAs_DB_w_praveen.fa')
         labels_and_inputs = [("Sequencing Type:", combo_box), ("Window Size:", window_size),
-                             ("Genome File Path:", QLineEdit()),
+                             ("Genome File Path:", genome_file_path),
                              ("init File Path:", QLineEdit()), ("3p File Path:", QLineEdit()),
-                             ("Fasta File Path:", QLineEdit()), ("Output File Name:", output_file_name)]
+                             ("Fasta File Path:", fasta_file_path), ("Output File Name:", output_file_name)]
 
         for i in range(len(labels_and_inputs)):
             label, input_var = labels_and_inputs[i]
