@@ -23,11 +23,13 @@ def stats(my_cov, start, end):
 
 
 def calculateScores(my_number_list, my_cov, my_length, win_size, w):
+    #calculate the scores for each position based on the article
     score_a = [0] * my_length
     score_b = [0] * my_length
     score_c = [0] * my_length
 
     for i in range(0, my_length - win_size):
+        # Set NA for the first and last 5 positions of the gene since they cannot be properly calculated
         if my_number_list[i] < 6 or my_number_list[i + 5] < 7:
             score_a[i] = "NA"
             score_b[i] = "NA"
@@ -60,7 +62,7 @@ def calculateScores(my_number_list, my_cov, my_length, win_size, w):
     return score_a, score_b, score_c
 
 
-def covAndLen(my_number_list, init_library, three_p_library):
+def covAndLen(init_library, three_p_library):
     pre_my_init = pd.read_table(init_library, header=None, usecols=[2])
     pre_my3p = pd.read_table(three_p_library, header=None, usecols=[2])
     my_new_init = pre_my_init[2].tolist()
@@ -80,14 +82,18 @@ def covAndLen(my_number_list, init_library, three_p_library):
 
     return my_new_init, my_new_3p, cov, len(my_new_init)
 
-
+#TODO: add the difference between the two sequencing types (PRS and Total RNA)
 def runScript(sequencing_type, window_size, genome_file_path, init_file_path, three_p_file_path, fasta_file_path,
               output_file_name):
     # The program takes a genome file, init file, 3p file, fasta file path and known snoRNA info as arguments
+
+    #  set the value of W as per the article
     w = (1 + (1 - 0.1 * window_size)) * window_size / 2
 
     # process genomes to work by size
+    #list that holds all the different genes and their lengths
     gene_list_per_base_pair = []
+    #list that holds the index for different positions in each gene
     number_list = []
     with open(genome_file_path, 'r') as file1:
         for line in file1:
@@ -107,19 +113,10 @@ def runScript(sequencing_type, window_size, genome_file_path, init_file_path, th
     for fasta_string in myfasta:
         fasta_string = "<" + fasta_string
         fasta_as_list.extend(list(fasta_string))
-    # sno_df = pd.read_table(sys.argv[5], delimiter="\t")
-    # new_sno_df = sno_df[['modified', 'snoRNA']]
 
-    # would consider using the code from count init\3p that found the different libraries and
-    # the length of the RNA, and then save them as a tuple in a list
-
-    # also need to see how we generalize the code for the fasta file, maybe consider putting it
-    # as part of the array? done in theory
-
-    myinit, my3p, mycov, mylength = covAndLen(number_list, init_file_path, three_p_file_path)
+    myinit, my3p, mycov, mylength = covAndLen(init_file_path, three_p_file_path)
     sa, sb, sc = calculateScores(number_list, mycov, mylength, window_size, w)
     createFile(gene_list_per_base_pair, sa, sb, sc, myinit, my3p, mycov, number_list, output_file_name, fasta_as_list)
-    # , new_sno_df
 
 
 class MyWidget(QWidget):
