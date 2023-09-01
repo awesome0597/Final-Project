@@ -1,3 +1,4 @@
+import os
 import statistics
 import sys
 import pandas as pd
@@ -8,7 +9,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QFormLayout, QGr
 
 def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p,
                my_cov, number_list_appended, output_file_name, fasta):
-    #Create a dataframe with the sequencing for all the different genes
+    # Create a dataframe with the sequencing for all the different genes
     df = pd.DataFrame({'Gene': gene_list, 'Position': number_list_appended, 'bp': fasta, '5p': my_init, '3p': my_3p,
                        'cov': my_cov, 'Sa': score_a, 'Sb': score_b, 'Sc': score_c})
     # Save file to excel
@@ -16,14 +17,14 @@ def createFile(gene_list, score_a, score_b, score_c, my_init, my_3p,
 
 
 def stats(my_cov, start, end):
-    #calculate the mean and standard deviation of the coverage
+    # calculate the mean and standard deviation of the coverage
     mean = statistics.fmean(my_cov[int(start):int(end)])
     std = statistics.stdev(my_cov[int(start):int(end)])
     return mean, std
 
 
 def calculateScores(my_number_list, my_cov, my_length, win_size, w):
-    #calculate the scores for each position based on the article
+    # calculate the scores for each position based on the article
     score_a = [0] * my_length
     score_b = [0] * my_length
     score_c = [0] * my_length
@@ -73,7 +74,7 @@ def covAndLen(init_library, three_p_library):
         my_new_init[i + 1] = my_holder_init[i]
     my_new_init[0] = 0
     for i in range(len(my_new_3p) - 1, 1, -1):
-        my_new_3p[i-1] = my_holder_3p[i]
+        my_new_3p[i - 1] = my_holder_3p[i]
     my_new_3p[len(my_new_3p) - 1] = 0
 
     cov = []
@@ -82,7 +83,7 @@ def covAndLen(init_library, three_p_library):
 
     return my_new_init, my_new_3p, cov, len(my_new_init)
 
-#TODO: add the difference between the two sequencing types (PRS and Total RNA)
+
 def runScript(sequencing_type, window_size, genome_file_path, init_file_path, three_p_file_path, fasta_file_path,
               output_file_name):
     # The program takes a genome file, init file, 3p file, fasta file path and known snoRNA info as arguments
@@ -91,28 +92,49 @@ def runScript(sequencing_type, window_size, genome_file_path, init_file_path, th
     w = (1 + (1 - 0.1 * window_size)) * window_size / 2
 
     # process genomes to work by size
-    #list that holds all the different genes and their lengths
+    # list that holds all the different genes and their lengths
     gene_list_per_base_pair = []
-    #list that holds the index for different positions in each gene
-    number_list = []
-    with open(genome_file_path, 'r') as file1:
-        for line in file1:
-            chrom, rna_length = line.strip().split()
-            genes_to_add = [chrom] * (int(rna_length) + 1)
-            gene_list_per_base_pair.extend(genes_to_add)
-            for p in range(0, int(rna_length) + 1):
-                number_list.append(p)
-    file1.close()
-    # handle fasta file
-    myfasta = []
     fasta_as_list = []
-    with open(fasta_file_path) as handle:
-        for record in SeqIO.parse(handle, "fasta"):
-            myfasta.append(str(record.seq))
-    handle.close()
-    for fasta_string in myfasta:
-        fasta_string = "<" + fasta_string
-        fasta_as_list.extend(list(fasta_string))
+    number_list = []
+    # list that holds the index for different positions in each gene
+    if sequencing_type == "Total RNA":
+        overall_length = 0
+        with open(genome_file_path, 'r') as file1:
+            for line in file1:
+                chrom, rna_length = line.strip().split()
+                genes_to_add = [chrom] * (int(rna_length))
+                gene_list_per_base_pair.extend(genes_to_add)
+                overall_length = overall_length + int(rna_length)
+        file1.close()
+        number_list = list(range(0, overall_length))
+        # handle fasta file
+        myfasta = []
+        with open(fasta_file_path) as handle:
+            for record in SeqIO.parse(handle, "fasta"):
+                myfasta.append(str(record.seq))
+        handle.close()
+        for fasta_string in myfasta:
+            fasta_as_list.extend(list(fasta_string))
+
+    elif sequencing_type == "PRS":
+        number_list = []
+        with open(genome_file_path, 'r') as file1:
+            for line in file1:
+                chrom, rna_length = line.strip().split()
+                genes_to_add = [chrom] * (int(rna_length) + 1)
+                gene_list_per_base_pair.extend(genes_to_add)
+                for p in range(-1, int(rna_length)):
+                    number_list.append(p)
+        file1.close()
+        # handle fasta file
+        myfasta = []
+        with open(fasta_file_path) as handle:
+            for record in SeqIO.parse(handle, "fasta"):
+                myfasta.append(str(record.seq))
+        handle.close()
+        for fasta_string in myfasta:
+            fasta_string = "<" + fasta_string
+            fasta_as_list.extend(list(fasta_string))
 
     myinit, my3p, mycov, mylength = covAndLen(init_file_path, three_p_file_path)
     sa, sb, sc = calculateScores(number_list, mycov, mylength, window_size, w)
@@ -147,10 +169,10 @@ class MyWidget(QWidget):
         output_file_name.setText('temp.xlsx')
         # set default genome file
         genome_file_path = QLineEdit()
-        genome_file_path.setText('PRS_genome.txt')
+        genome_file_path.setText('TB_rRna_genome.txt')
         # set fasta file
         fasta_file_path = QLineEdit()
-        fasta_file_path.setText('TB_small_RNAs_DB_w_praveen.fa')
+        fasta_file_path.setText('TB_rRNA_chr2.fa')
         labels_and_inputs = [("Sequencing Type:", combo_box), ("Window Size:", window_size),
                              ("Genome File Path:", genome_file_path),
                              ("init File Path:", QLineEdit()), ("3p File Path:", QLineEdit()),
