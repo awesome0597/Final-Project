@@ -111,6 +111,8 @@ def runScript(sequencing_type, window_size, genome_file_path, init_file_path, th
         myfasta = []
         with open(fasta_file_path) as handle:
             for record in SeqIO.parse(handle, "fasta"):
+                if str(record.seq) == "X":
+                    continue
                 myfasta.append(str(record.seq))
         handle.close()
         for fasta_string in myfasta:
