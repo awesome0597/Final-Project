@@ -16,8 +16,8 @@ foreach bam_file (*.bam)
     bedtools genomecov -d -g $file1 -i $prefix\_vs_$type\_good_pairs.sorted.bed  >  $prefix\_vs_$type\_good_pairs.sorted.genomecov
 
     ##init
-    python3 $path2/CountInitiating_prototype.py $file1 $prefix\_vs_smallRNA_good_pairs.sorted.bed > $prefix\_vs_smallRNA_good_pairs_prototype.sorted.init
+    python3 $path2/CountInitiating.py $file1 $prefix\_vs_smallRNA_good_pairs.sorted.bed > $prefix\_vs_smallRNA_good_pairs.sorted.init
 
-    python3 $path2/count3p_prototype.py $file1 $prefix\_vs_smallRNA_good_pairs.sorted.bed > $prefix\_vs_smallRNA_good_pairs_prototype.sorted.3p
+    python3 $path2/count3p.py $file1 $prefix\_vs_smallRNA_good_pairs.sorted.bed > $prefix\_vs_smallRNA_good_pairs.sorted.3p
 end
 
