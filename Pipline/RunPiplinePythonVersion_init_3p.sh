@@ -1,10 +1,10 @@
 #!/usr/bin/env tcsh
 
-set path1="/home/user/brucea/PRS_Data/"
-set path2="/home/user/brucea/Scripts/"
-set type="smallRNA"
-set snrna="/home/user/brucea/PRS_Data/TB_small_RNAs_DB_w_praveen.fa"
-set file1="/home/user/tirza/DB/TB_small_RNAs_DB_w_praveen.genome"
+set path1="Insert pathe to raw data"
+set path2="Insert path to script location"
+set type="Insert type of data"
+set snrna="Insert fata file or path to fasta file"
+set file1="Insert pathe to genome file or genome file"
 
 ###################################################################################
 foreach bam_file (*.bam)
