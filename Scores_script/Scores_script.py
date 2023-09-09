@@ -160,7 +160,7 @@ class MyWidget(QWidget):
 
         # Create the QLineEdit and QComboBox widgets
         combo_box = QComboBox()
-        combo_box.addItem("PRS")
+        combo_box.addItem("PRS/Poly A")
         combo_box.addItem("Total RNA")
         # set default value for window size
         window_size = QLineEdit()
