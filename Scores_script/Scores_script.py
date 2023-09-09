@@ -123,9 +123,9 @@ def runScript(sequencing_type, window_size, genome_file_path, init_file_path, th
         with open(genome_file_path, 'r') as file1:
             for line in file1:
                 chrom, rna_length = line.strip().split()
-                genes_to_add = [chrom] * (int(rna_length) + 1)
+                genes_to_add = [chrom] * (int(rna_length))
                 gene_list_per_base_pair.extend(genes_to_add)
-                for p in range(-1, int(rna_length)):
+                for p in range(0, int(rna_length)):
                     number_list.append(p)
         file1.close()
         # handle fasta file
@@ -135,7 +135,6 @@ def runScript(sequencing_type, window_size, genome_file_path, init_file_path, th
                 myfasta.append(str(record.seq))
         handle.close()
         for fasta_string in myfasta:
-            fasta_string = "<" + fasta_string
             fasta_as_list.extend(list(fasta_string))
 
     myinit, my3p, mycov, mylength = covAndLen(init_file_path, three_p_file_path)
