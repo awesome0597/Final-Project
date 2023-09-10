@@ -1,6 +1,6 @@
 #!/usr/bin/env tcsh
 
-set path1="Insert pathe to raw data"
+set path1="Insert path to raw data"
 set path2="Insert path to script location"
 set type="Insert type of data"
 set snrna="Insert fata file or path to fasta file"
